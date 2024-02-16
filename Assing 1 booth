@@ -1,0 +1,174 @@
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+# Create the sales dataset
+np.random.seed(0)
+data = {
+    'ID': np.arange(1, 501),
+    'TV': np.random.randint(1, 100, 500),
+    'Radio': np.random.randint(1, 100, 500),
+    'Newspaper': np.random.randint(1, 100, 500),
+    'Sales': np.random.randint(100, 1000, 500)
+}
+sales_df = pd.DataFrame(data)
+
+# Identify independent and target variables
+X = sales_df[['TV', 'Radio', 'Newspaper']]
+y = sales_df['Sales']
+
+# Split the dataset into training and testing sets (70:30 ratio)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
+
+# Print the shapes of the training and testing sets
+print("Training set shape:")
+print(X_train.shape, y_train.shape)
+print("Testing set shape:")
+print(X_test.shape, y_test.shape)
+
+# Build a simple linear regression model
+model = LinearRegression()
+
+# Fit the model to the training data
+model.fit(X_train, y_train)
+
+
+###
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LinearRegression
+
+# Create the realestate dataset
+np.random.seed(0)
+data = {
+    'ID': np.arange(1, 501),
+    'Flat': np.random.randint(1, 100, 500),
+    'Houses': np.random.randint(1, 100, 500),
+    'Purchases': np.random.randint(100000, 1000000, 500)
+}
+realestate_df = pd.DataFrame(data)
+
+# Identify independent and target variables
+X = realestate_df[['Flat', 'Houses']]
+y = realestate_df['Purchases']
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Print the shapes of the training and testing sets
+print("Training set shape:")
+print(X_train.shape, y_train.shape)
+print("Testing set shape:")
+print(X_test.shape, y_test.shape)
+
+# Build a simple linear regression model
+model = LinearRegression()
+
+# Fit the model to the training data
+model.fit(X_train, y_train)
+
+###
+###
+import pandas as pd
+import numpy as np
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, confusion_matrix
+
+# Create the User dataset
+np.random.seed(0)
+data = {
+    'User ID': np.arange(1, 501),
+    'Gender': np.random.choice(['Male', 'Female'], size=500),
+    'Age': np.random.randint(18, 65, 500),
+    'EstimatedSalary': np.random.randint(20000, 150000, 500),
+    'Purchased': np.random.randint(0, 2, 500)  # Binary variable: 0 - Not purchased, 1 - Purchased
+}
+user_df = pd.DataFrame(data)
+
+# Convert categorical variables into dummy variables
+user_df = pd.get_dummies(user_df, columns=['Gender'], drop_first=True)
+
+# Identify independent and target variables
+X = user_df[['Age', 'EstimatedSalary', 'Gender_Male']]
+y = user_df['Purchased']
+
+# Split the dataset into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Feature scaling
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
+
+# Build a logistic regression model
+model = LogisticRegression(random_state=42)
+
+# Fit the model to the training data
+model.fit(X_train, y_train)
+
+# Predictions
+y_pred = model.predict(X_test)
+
+# Model evaluation
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+
+print("Accuracy:", accuracy)
+print("Confusion Matrix:")
+print(conf_matrix)
+
+
+##B2
+import pandas as pd
+import numpy as np
+from sklearn.datasets import load_iris
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+import seaborn as sns
+
+# Load the Iris dataset
+iris = load_iris()
+iris_df = pd.DataFrame(data=np.c_[iris['data'], iris['target']], columns=iris['feature_names'] + ['target'])
+iris_df['species'] = iris_df['target'].map({0: 'setosa', 1: 'versicolor', 2: 'virginica'})
+
+# View basic statistical details for each species
+setosa_stats = iris_df[iris_df['species'] == 'setosa'].describe()
+versicolor_stats = iris_df[iris_df['species'] == 'versicolor'].describe()
+virginica_stats = iris_df[iris_df['species'] == 'virginica'].describe()
+
+print("Setosa Statistical Details:")
+print(setosa_stats)
+print("\nVersicolor Statistical Details:")
+print(versicolor_stats)
+print("\nVirginica Statistical Details:")
+print(virginica_stats)
+
+# Split the dataset into features and target variable
+X = iris.data[:, :4]
+y = iris.target
+
+# Split the data into training and testing sets
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+# Apply logistic regression
+model = LogisticRegression(max_iter=1000, random_state=42)
+model.fit(X_train, y_train)
+
+# Predictions
+y_pred = model.predict(X_test)
+
+# Model evaluation
+accuracy = accuracy_score(y_test, y_pred)
+conf_matrix = confusion_matrix(y_test, y_pred)
+classification_rep = classification_report(y_test, y_pred, target_names=iris.target_names)
+
+print("\nAccuracy:", accuracy)
+print("\nConfusion Matrix:")
+print(conf_matrix)
+print("\nClassification Report:")
+print(classification_rep)
