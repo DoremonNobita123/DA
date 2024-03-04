@@ -1,0 +1,151 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_BLOCKS 100
+#define MAX_FILENAME_LENGTH 20
+#define MAX_INDEX_ENTRIES 10
+
+typedef struct {
+    char filename[MAX_FILENAME_LENGTH];
+    int indexBlock;
+    int blocksAllocated[MAX_INDEX_ENTRIES];
+    int numBlocks;
+} FileEntry;
+
+void initializeDisk(int disk[], int n) {
+    for (int i = 0; i < n; i++) {
+        disk[i] = 0;
+    }
+}
+
+void allocateFile(int disk[], int n, int blocksNeeded, FileEntry directory[], int *fileCount) {
+    char filename[MAX_FILENAME_LENGTH];
+    printf("Enter filename: ");
+    scanf("%s", filename);
+
+    int indexBlock = -1;
+    for (int i = 0; i <= n - blocksNeeded; i++) {
+        int j;
+        for (j = i; j < i + blocksNeeded; j++) {
+            if (disk[j] != 0) {
+                break;
+            }
+        }
+        if (j == i + blocksNeeded) {
+            indexBlock = i;
+            break;
+        }
+    }
+
+    if (indexBlock != -1) {
+        for (int i = indexBlock; i < indexBlock + blocksNeeded; i++) {
+            disk[i] = 1;
+        }
+        strcpy(directory[*fileCount].filename, filename);
+        directory[*fileCount].indexBlock = indexBlock;
+        for (int i = 0; i < blocksNeeded; i++) {
+            directory[*fileCount].blocksAllocated[i] = indexBlock + i;
+        }
+        directory[*fileCount].numBlocks = blocksNeeded;
+        (*fileCount)++;
+        printf("File '%s' allocated successfully with index block at %d\n", filename, indexBlock);
+    } else {
+        printf("File allocation failed. Not enough contiguous free blocks.\n");
+    }
+}
+
+void showDirectory(FileEntry directory[], int fileCount) {
+    printf("Directory:\n");
+    printf("Filename\tIndex Block\tBlocks Allocated\n");
+    for (int i = 0; i < fileCount; i++) {
+        printf("%s\t\t%d\t\t", directory[i].filename, directory[i].indexBlock);
+        for (int j = 0; j < directory[i].numBlocks; j++) {
+            printf("%d ", directory[i].blocksAllocated[j]);
+        }
+        printf("\n");
+    }
+}
+
+void deleteFile(int disk[], FileEntry directory[], int *fileCount) {
+    char filename[MAX_FILENAME_LENGTH];
+    printf("Enter filename to delete: ");
+    scanf("%s", filename);
+
+    int found = 0;
+    for (int i = 0; i < *fileCount; i++) {
+        if (strcmp(directory[i].filename, filename) == 0) {
+            found = 1;
+            for (int j = 0; j < directory[i].numBlocks; j++) {
+                disk[directory[i].blocksAllocated[j]] = 0;
+            }
+            for (int j = i; j < *fileCount - 1; j++) {
+                directory[j] = directory[j + 1];
+            }
+            (*fileCount)--;
+            printf("File '%s' deleted successfully.\n", filename);
+            break;
+        }
+    }
+    if (!found) {
+        printf("File '%s' not found.\n", filename);
+    }
+}
+
+void showBitVector(int disk[], int n) {
+    printf("Bit Vector (Disk Status):\n");
+    for (int i = 0; i < n; i++) {
+        printf("%d ", disk[i]);
+    }
+    printf("\n");
+}
+
+int main() {
+    int disk[MAX_BLOCKS];
+    FileEntry directory[MAX_BLOCKS];
+    int diskSize, choice, blocksNeeded, fileCount = 0;
+
+    printf("Enter the size of the disk: ");
+    scanf("%d", &diskSize);
+
+    initializeDisk(disk, diskSize);
+
+    while (1) {
+        printf("\nMenu:\n");
+        printf("1. Create New File\n");
+        printf("2. Show Directory\n");
+        printf("3. Delete File\n");
+        printf("4. Show Bit Vector\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                printf("Enter number of blocks needed for the file: ");
+                scanf("%d", &blocksNeeded);
+                if (blocksNeeded < 1 || blocksNeeded > MAX_INDEX_ENTRIES) {
+                    printf("Invalid number of blocks.\n");
+                    break;
+                }
+                allocateFile(disk, diskSize, blocksNeeded, directory, &fileCount);
+                break;
+            case 2:
+                showDirectory(directory, fileCount);
+                break;
+            case 3:
+                deleteFile(disk, directory, &fileCount);
+                break;
+            case 4:
+                showBitVector(disk, diskSize);
+                break;
+            case 5:
+                printf("Exiting program.\n");
+                exit(0);
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
