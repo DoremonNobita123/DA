@@ -149,3 +149,150 @@ int main() {
 
     return 0;
 }
+###1
+
+#include<stdio.h>
+#include<stdlib.h>
+
+int main() {
+    int queue[20], head, q_size, seek=0, temp;
+    float avg_seek;
+    printf("Enter the size of disk queue: ");
+    scanf("%d", &q_size);
+    printf("Enter the disk queue: ");
+    for(int i=0; i<q_size; i++)
+        scanf("%d", &queue[i]);
+    printf("Enter the initial head position: ");
+    scanf("%d", &head);
+    queue[q_size] = head;
+    q_size++;
+    // Sorting the disk queue
+    for(int i=0; i<q_size; i++) {
+        for(int j=i+1; j<q_size; j++) {
+            if(queue[i]>queue[j]) {
+                temp = queue[i];
+                queue[i] = queue[j];
+                queue[j] = temp;
+            }
+        }
+    }
+    int start_index;
+    for(int i=0; i<q_size; i++) {
+        if(queue[i] == head) {
+            start_index = i;
+            break;
+        }
+    }
+    printf("Enter the direction (0 for left, 1 for right): ");
+    int direction;
+    scanf("%d", &direction);
+    if(direction == 0) {
+        for(int i=start_index; i>=0; i--) {
+            printf("%d -> ", queue[i]);
+            seek += abs(head - queue[i]);
+            head = queue[i];
+        }
+        seek += head;
+        for(int i=start_index+1; i<q_size; i++) {
+            printf("%d -> ", queue[i]);
+            seek += abs(head - queue[i]);
+            head = queue[i];
+        }
+    }
+    else {
+        for(int i=start_index; i<q_size; i++) {
+            printf("%d -> ", queue[i]);
+            seek += abs(head - queue[i]);
+            head = queue[i];
+        }
+        seek += (99 - head);
+        printf("0 -> ");
+        seek += 99;
+        head = 0;
+        for(int i=0; i<start_index; i++) {
+            printf("%d -> ", queue[i]);
+            seek += abs(head - queue[i]);
+            head = queue[i];
+        }
+    }
+    printf("\nTotal seek time: %d\n", seek);
+    avg_seek = (float)seek / q_size;
+    printf("Average seek time: %.2f\n", avg_seek);
+    return 0;
+}
+
+
+###2
+
+#include<stdio.h>
+#include<stdlib.h>
+
+int main() {
+    int queue[20], head, q_size, seek=0, temp;
+    float avg_seek;
+    printf("Enter the size of disk queue: ");
+    scanf("%d", &q_size);
+    printf("Enter the disk queue: ");
+    for(int i=0; i<q_size; i++)
+        scanf("%d", &queue[i]);
+    printf("Enter the initial head position: ");
+    scanf("%d", &head);
+    queue[q_size] = head;
+    q_size++;
+    // Sorting the disk queue
+    for(int i=0; i<q_size; i++) {
+        for(int j=i+1; j<q_size; j++) {
+            if(queue[i]>queue[j]) {
+                temp = queue[i];
+                queue[i] = queue[j];
+                queue[j] = temp;
+            }
+        }
+    }
+    int start_index;
+    for(int i=0; i<q_size; i++) {
+        if(queue[i] == head) {
+            start_index = i;
+            break;
+        }
+    }
+    printf("Enter the direction (0 for left, 1 for right): ");
+    int direction;
+    scanf("%d", &direction);
+    if(direction == 0) {
+        for(int i=start_index; i>=0; i--) {
+            printf("%d -> ", queue[i]);
+            seek += abs(head - queue[i]);
+            head = queue[i];
+        }
+        seek += (99 - head);
+        printf("99 -> 0 -> ");
+        seek += 99;
+        head = 0;
+        for(int i=q_size-1; i>start_index; i--) {
+            printf("%d -> ", queue[i]);
+            seek += abs(head - queue[i]);
+            head = queue[i];
+        }
+    }
+    else {
+        for(int i=start_index; i<q_size; i++) {
+            printf("%d -> ", queue[i]);
+            seek += abs(head - queue[i]);
+            head = queue[i];
+        }
+        seek += (99 - head);
+        printf("99 -> 0 -> ");
+        seek += 99;
+        head = 0;
+        for(int i=0; i<start_index; i++) {
+            printf("%d -> ", queue[i]);
+            seek += abs(head - queue[i]);
+            head = queue[i];
+        }
+    }
+    printf("\nTotal seek time: %d\n", seek);
+    avg_seek = (float)seek / q_size;
+    printf("Average seek time: %.2f\n", avg_seek);
+    return 0;
+}
