@@ -1,0 +1,230 @@
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/RequestInfoServlet")
+public class RequestInfoServlet extends HttpServlet {
+    private static final long serialVersionUID = 1L;
+    
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        response.setContentType("text/html");
+        PrintWriter out = response.getWriter();
+        out.println("<html><head><title>Request Information</title></head><body>");
+        out.println("<h2>Request Information:</h2>");
+        out.println("<ul>");
+        out.println("<li>IP Address: " + request.getRemoteAddr() + "</li>");
+        out.println("<li>Browser Type: " + request.getHeader("User-Agent") + "</li>");
+        out.println("</ul>");
+        out.println("<h2>Server Information:</h2>");
+        out.println("<ul>");
+        out.println("<li>Server Name: " + request.getServerName() + "</li>");
+        out.println("<li>Server Port: " + request.getServerPort() + "</li>");
+        out.println("<li>Server OS Type: " + System.getProperty("os.name") + "</li>");
+        // Assuming you have a servlet context
+        out.println("<li>Currently Loaded Servlets: " + getServletNames(request) + "</li>");
+        out.println("</ul>");
+        out.println("</body></html>");
+    }
+    
+    // Helper method to get the names of currently loaded servlets
+    private String getServletNames(HttpServletRequest request) {
+        StringBuilder servletNames = new StringBuilder();
+        for (String servletName : request.getServletContext().getServletRegistrations().keySet()) {
+            servletNames.append(servletName).append(", ");
+        }
+        // Remove the trailing comma and space
+        if (servletNames.length() > 2) {
+            servletNames.setLength(servletNames.length() - 2);
+        }
+        return servletNames.toString();
+    }
+}
+
+2###
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>JSP Implicit Objects Example</title>
+</head>
+<body>
+    <h2>Using JSP Implicit Objects:</h2>
+    <p>i. Current Date and Time: <%= new java.util.Date() %></p>
+    
+    <p>ii. Request Header Information:</p>
+    <ul>
+        <li>User-Agent: <%= request.getHeader("User-Agent") %></li>
+        <li>Accept-Language: <%= request.getHeader("Accept-Language") %></li>
+    </ul>
+    
+    <%
+        // iii. Add Cookie using response object
+        Cookie cookie = new Cookie("username", "john_doe");
+        response.addCookie(cookie);
+    %>
+    <p>iii. Cookie added successfully.</p>
+    
+    <p>iv. Parameter value defined in <code>&lt;init-param&gt;</code>: <%= config.getInitParameter("paramName") %></p>
+    
+    <p>v. Parameter value defined in <code>&lt;context-param&gt;</code>: <%= application.getInitParameter("paramName") %></p>
+    
+    <p>vi. Current Session ID: <%= session.getId() %></p>
+    
+    <%
+        // vii. Set and get attributes using pageContext
+        pageContext.setAttribute("attributeName", "attributeValue");
+        String attributeValue = (String) pageContext.getAttribute("attributeName");
+    %>
+    <p>vii. Attribute set and retrieved successfully. Attribute Value: <%= attributeValue %></p>
+    
+    <p>viii. Name of Generated Servlet: <%= page.getClass().getName() %></p>
+</body>
+</html>
+
+#3
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Login</title>
+</head>
+<body>
+    <h2>Login</h2>
+    <form action="login.jsp" method="post">
+        Username: <input type="text" name="username"><br>
+        Password: <input type="password" name="password"><br>
+        <input type="submit" value="Login">
+    </form>
+</body>
+</html>
+
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.*" %>
+<%@ page import="java.io.*" %>
+<%@ page import="javax.servlet.*" %>
+<%@ page import="javax.servlet.http.*" %>
+<%
+    String username = request.getParameter("username");
+    String password = request.getParameter("password");
+    if ("your_username".equals(username) && "your_password".equals(password)) {
+        HttpSession session = request.getSession();
+        session.setAttribute("username", username);
+        response.sendRedirect("purchase.jsp");
+    } else {
+        response.sendRedirect("index.jsp");
+    }
+%>
+
+
+
+
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.*" %>
+<%@ page import="java.io.*" %>
+<%@ page import="javax.servlet.*" %>
+<%@ page import="javax.servlet.http.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Book Purchase</title>
+</head>
+<body>
+    <h2>Welcome <%= session.getAttribute("username") %>!</h2>
+    <h3>Book Purchase</h3>
+    <form action="cart.jsp" method="post">
+        Select books:<br>
+        <input type="checkbox" name="book" value="Book1"> Book 1 - $10<br>
+        <input type="checkbox" name="book" value="Book2"> Book 2 - $15<br>
+        <input type="checkbox" name="book" value="Book3"> Book 3 - $20<br>
+        <input type="submit" value="Add to Cart">
+    </form>
+</body>
+</html>
+
+
+
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.*" %>
+<%@ page import="java.io.*" %>
+<%@ page import="javax.servlet.*" %>
+<%@ page import="javax.servlet.http.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Cart</title>
+</head>
+<body>
+    <h2>Your Cart</h2>
+    <h3>Selected Books:</h3>
+    <% 
+        HttpSession session = request.getSession();
+        String[] books = request.getParameterValues("book");
+        if (books != null && books.length > 0) {
+            for (String book : books) {
+                out.println("- " + book + "<br>");
+            }
+            session.setAttribute("selectedBooks", Arrays.asList(books));
+        } else {
+            out.println("No books selected!<br>");
+        }
+    %>
+    <form action="checkout.jsp" method="post">
+        <input type="submit" value="Checkout">
+    </form>
+</body>
+</html>
+
+
+
+
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8"%>
+<%@ page import="java.util.*" %>
+<%@ page import="java.io.*" %>
+<%@ page import="javax.servlet.*" %>
+<%@ page import="javax.servlet.http.*" %>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Checkout</title>
+</head>
+<body>
+    <h2>Checkout</h2>
+    <h3>Selected Books:</h3>
+    <% 
+        HttpSession session = request.getSession();
+        List<String> selectedBooks = (List<String>) session.getAttribute("selectedBooks");
+        if (selectedBooks != null && !selectedBooks.isEmpty()) {
+            for (String book : selectedBooks) {
+                out.println("- " + book + "<br>");
+            }
+        } else {
+            out.println("No books selected!<br>");
+        }
+    %>
+    <h3>Total Bill:</h3>
+    <% 
+        double total = 0;
+        if (selectedBooks != null) {
+            for (String book : selectedBooks) {
+                if ("Book1".equals(book)) total += 10;
+                else if ("Book2".equals(book)) total += 15;
+                else if ("Book3".equals(book)) total += 20;
+            }
+        }
+        out.println("Total: $" + total);
+    %>
+</body>
+</html>
+
