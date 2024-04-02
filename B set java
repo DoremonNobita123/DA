@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Search</title>
+</head>
+<body>
+    <h1>Customer Search</h1>
+    <form action="SearchServlet" method="get">
+        <label for="customerNumber">Customer Number:</label>
+        <input type="text" id="customerNumber" name="customerNumber" required>
+        <button type="submit">Search</button>
+    </form>
+</body>
+</html>
+import java.io.IOException;
+import java.io.PrintWriter;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/SearchServlet")
+public class SearchServlet extends HttpServlet {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Get the customer number from the request
+        String customerNumber = request.getParameter("customerNumber");
+
+        // Simulate searching in the database
+        boolean customerFound = searchCustomerInDatabase(customerNumber);
+
+        // Set the response content type
+        response.setContentType("text/html");
+        
+        // Get the PrintWriter object
+        PrintWriter out = response.getWriter();
+
+        // Display customer details if found, otherwise display error message
+        if (customerFound) {
+            out.println("<h2>Customer Details</h2>");
+            // Here you would retrieve and display the customer details from the database
+        } else {
+            out.println("<h2>Error</h2>");
+            out.println("<p>Customer not found.</p>");
+        }
+    }
+
+    // Method to simulate searching for the customer in the database
+    private boolean searchCustomerInDatabase(String customerNumber) {
+        // Here you would perform the actual database query to search for the customer
+        // This is just a placeholder method
+        // Return true if customer found, false otherwise
+        return false;
+    }
+}
+
+
+##2
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Select Subject</title>
+</head>
+<body>
+    <h1>Select Subject</h1>
+    <form action="SetCookieServlet" method="post">
+        <label><input type="radio" name="subject" value="Maths"> Maths</label><br>
+        <label><input type="radio" name="subject" value="Physics"> Physics</label><br>
+        <label><input type="radio" name="subject" value="Chemistry"> Chemistry</label><br>
+        <label><input type="radio" name="subject" value="Biology"> Biology</label><br>
+        <button type="submit">Submit</button>
+        <button type="reset">Reset</button>
+    </form>
+</body>
+</html>
+import java.io.IOException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+@WebServlet("/SetCookieServlet")
+public class SetCookieServlet extends HttpServlet {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        // Get the selected subject from the request
+        String subject = request.getParameter("subject");
+
+        // Check if a cookie for the selected subject already exists
+        Cookie[] cookies = request.getCookies();
+        boolean cookieExists = false;
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("selectedSubject") && cookie.getValue().equals(subject)) {
+                    cookieExists = true;
+                    break;
+                }
+            }
+        }
+
+        // If the cookie doesn't exist, add it
+        if (!cookieExists) {
+            Cookie subjectCookie = new Cookie("selectedSubject", subject);
+            subjectCookie.setMaxAge(24 * 60 * 60); // Cookie expires in 24 hours
+            response.addCookie(subjectCookie);
+        }
+
+        // Send a message back to the client
+        response.setContentType("text/html");
+        response.getWriter().println("<p>Cookie set for subject: " + subject + "</p>");
+    }
+}
+
+
+##3
+
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+    pageEncoding="UTF-8"%>
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Patient Details</title>
+<style>
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+    th, td {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    th {
+        background-color: #f2f2f2;
+    }
+</style>
+</head>
+<body>
+    <h2>Patient Details</h2>
+    <table>
+        <tr>
+            <th>Patient No</th>
+            <th>Patient Name</th>
+            <th>Patient Address</th>
+            <th>Patient Age</th>
+            <th>Patient Disease</th>
+        </tr>
+        <%-- Sample patient data (replace with actual data retrieval logic) --%>
+        <% 
+            // Sample patient data (replace with actual data retrieval logic)
+            String[][] patients = {
+                {"001", "John Doe", "123 Main St", "30", "Flu"},
+                {"002", "Jane Smith", "456 Oak St", "45", "Diabetes"},
+                {"003", "Alice Johnson", "789 Elm St", "25", "Headache"}
+            };
+            
+            // Display patient details in tabular form
+            for (String[] patient : patients) {
+        %>
+        <tr>
+            <td><%= patient[0] %></td>
+            <td><%= patient[1] %></td>
+            <td><%= patient[2] %></td>
+            <td><%= patient[3] %></td>
+            <td><%= patient[4] %></td>
+        </tr>
+        <% } %>
+    </table>
+</body>
+</html>
